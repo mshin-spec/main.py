@@ -4,7 +4,7 @@ from datetime import datetime
 
 # [필수 설정]
 TOKEN = "8070079193:AAEKHha5VfHNli7YT29nSSqjV4dILYRGdGE"
-CHAT_ID = "본인의_ID_입력" 
+CHAT_ID = "948672091" 
 KEYWORDS = ["가축분뇨처리", "준공영제", "사모펀드", "부동산"]
 
 def send_telegram_msg(text):
