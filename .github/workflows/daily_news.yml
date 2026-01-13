@@ -1,0 +1,18 @@
+name: Daily News Scraper
+on:
+  schedule:
+    - cron: '0 0 * * *' # 매일 한국 시간 오전 9시 실행
+  workflow_dispatch: # (중요) 이 코드가 있으면 웹에서 수동 실행이 가능해집니다.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install feedparser requests
+      - name: Run Scraper
+        run: python main.py
