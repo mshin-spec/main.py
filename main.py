@@ -1,22 +1,25 @@
 import feedparser
 import requests
 from datetime import datetime
+import re
 
 # [필수 설정]
 TOKEN = "8070079193:AAEKHha5VfHNli7YT29nSSqjV4dILYRGdGE"
-CHAT_ID = "948672091" 
+CHAT_ID = "948672091" # 유령 문자 제거됨
 KEYWORDS = ["가축분뇨처리", "준공영제", "사모펀드", "부동산"]
 
 def send_telegram_msg(text):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    # MarkdownV2를 사용하여 깔끔한 링크 스타일 적용
     payload = {
         'chat_id': CHAT_ID, 
         'text': text, 
         'parse_mode': 'Markdown',
-        'disable_web_page_preview': True # 링크 미리보기 꺼서 공간 절약
+        'disable_web_page_preview': True
     }
-    requests.post(url, data=payload)
+    response = requests.post(url, data=payload)
+    # 전송 실패 시 로그 출력 (GitHub Actions 로그에서 확인 가능)
+    if response.status_code != 200:
+        print(f"Error: {response.text}")
 
 def scrap_news():
     today = datetime.now().strftime('%Y-%m-%d')
@@ -32,11 +35,13 @@ def scrap_news():
         
         count = 0
         for entry in feed.entries:
-            if count >= 3: break # 키워드당 제목 3개 제한
+            if count >= 3: break
             if entry.link in sent_links: continue
             
-            # 제목에서 특수문자 처리 및 포맷팅
-            clean_title = entry.title.split(" - ")[0] # 언론사명 제거하여 간결하게
+            # 마크다운 충돌 방지: 제목 내 [ ] 제거
+            clean_title = entry.title.split(" - ")[0]
+            clean_title = clean_title.replace("[", "(").replace("]", ")")
+            
             keyword_section += f"• [{clean_title}]({entry.link})\n"
             
             sent_links.add(entry.link)
@@ -46,7 +51,6 @@ def scrap_news():
         if has_new_content:
             final_report += keyword_section + "\n"
 
-    # 최종 취합된 메시지가 있을 경우에만 전송
     if sent_links:
         send_telegram_msg(final_report)
     else:
