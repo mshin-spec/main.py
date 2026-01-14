@@ -1,8 +1,8 @@
 name: Daily News Scraper
 on:
   schedule:
-    - cron: '0 0 * * *' # 매일 한국 시간 오전 9시 실행
-  workflow_dispatch: # (중요) 이 코드가 있으면 웹에서 수동 실행이 가능해집니다.
+    - cron: '0 0 * * *' # UTC 00:00 = 한국 오전 09:00
+  workflow_dispatch: # 수동 실행 버튼 활성화
 jobs:
   build:
     runs-on: ubuntu-latest
